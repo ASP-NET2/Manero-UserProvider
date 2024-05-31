@@ -14,9 +14,10 @@ namespace Manero_UserProvider.Functions
         private readonly ILogger<CreateUserFunction> _logger;
         private readonly DataContext _context;
 
-        public CreateUserFunction(ILogger<CreateUserFunction> logger)
+        public CreateUserFunction(ILogger<CreateUserFunction> logger, DataContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
 
