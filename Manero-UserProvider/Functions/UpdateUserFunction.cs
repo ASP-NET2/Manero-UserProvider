@@ -1,4 +1,5 @@
 using Manero_UserProvider.Models;
+using Manero_UserProvider.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -13,12 +14,12 @@ namespace Manero_UserProvider.Functions
     public class UpdateUserFunction
     {
         private readonly ILogger<UpdateUserFunction> _logger;
-        private readonly DataContext _context;
+        private readonly UpdateService _service;
 
-        public UpdateUserFunction(ILogger<UpdateUserFunction> logger, DataContext context)
+        public UpdateUserFunction(ILogger<UpdateUserFunction> logger, UpdateService service)
         {
             _logger = logger;
-            _context = context;
+            _service = service;
         }
 
         [Function("UpdateUserFunction")]
@@ -36,32 +37,23 @@ namespace Manero_UserProvider.Functions
                 {
                     _logger.LogWarning($"Invalid profile data for user {id}");
                     response.StatusCode = System.Net.HttpStatusCode.BadRequest;
-                    await response.WriteStringAsync("Invalid prfile data");
+                    await response.WriteStringAsync("Invalid profile data");
                     return response;
                 }
 
-                var user = await _context.AccountUser.FirstOrDefaultAsync(u => u.IdentityUserId == id);
-                if (user == null)
+                var result = await _service.UpdateUserAsync(id, profile);
+
+                if (result == null)
                 {
-                    _logger.LogWarning($"User with ID {id} not found.");
                     response.StatusCode = System.Net.HttpStatusCode.NotFound;
                     await response.WriteStringAsync($"User with ID {id} not found.");
                     return response;
                 }
-                user.FirstName = profile.FirstName;
-                user.LastName = profile.LastName;
-                user.ImageUrl = profile.ImageUrl;
-                user.PhoneNumber = profile.PhoneNumber;
-                user.Location = profile.Location;
-
-                _context.AccountUser.Update(user);
-                await _context.SaveChangesAsync();
 
                 _logger.LogInformation($"Profile for user ID: {id} successfully updated.");
                 response.StatusCode = System.Net.HttpStatusCode.OK;
-                await response.WriteAsJsonAsync(profile);
+                await response.WriteAsJsonAsync(result);
                 return response;
-
             }
             catch (Exception ex)
             {

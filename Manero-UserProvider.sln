@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Manero-UserProvider", "Mane
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UserProviderLibrary", "UserProviderLibrary\UserProviderLibrary.csproj", "{E3C605A0-BD1E-4A2F-9E55-7F3D6C3E48E0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UserProviderTests", "UserProviderTests\UserProviderTests.csproj", "{4359D911-BC0F-4867-B37E-C1736E8175F9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{E3C605A0-BD1E-4A2F-9E55-7F3D6C3E48E0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E3C605A0-BD1E-4A2F-9E55-7F3D6C3E48E0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E3C605A0-BD1E-4A2F-9E55-7F3D6C3E48E0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4359D911-BC0F-4867-B37E-C1736E8175F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4359D911-BC0F-4867-B37E-C1736E8175F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4359D911-BC0F-4867-B37E-C1736E8175F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4359D911-BC0F-4867-B37E-C1736E8175F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,4 +1,5 @@
 using Manero_UserProvider.Models;
+using Manero_UserProvider.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -12,12 +13,12 @@ namespace Manero_UserProvider.Functions
     public class GetAllFunction
     {
         private readonly ILogger<GetAllFunction> _logger;
-        private readonly DataContext _context;
+        private readonly GetAllService _service;
 
-        public GetAllFunction(ILogger<GetAllFunction> logger, DataContext context)
+        public GetAllFunction(ILogger<GetAllFunction> logger, GetAllService service)
         {
             _logger = logger;
-            _context = context;
+            _service = service;
         }
 
         [Function("GetAllFunction")]
@@ -29,17 +30,10 @@ namespace Manero_UserProvider.Functions
 
             try
             {
-                var profiles = await _context.AccountUser.Select(u => new ProfileModel
-                {
-                    IdentityUserId = u.IdentityUserId,
-                    FirstName = u.FirstName,
-                    LastName = u.LastName,
-                }).ToListAsync();
+                var profiles = await _service.GetAllUsersAsync();
                 response.StatusCode = System.Net.HttpStatusCode.OK;
                 await response.WriteAsJsonAsync(profiles);
                 return response;
-
-
             }
             catch (Exception ex)
             {

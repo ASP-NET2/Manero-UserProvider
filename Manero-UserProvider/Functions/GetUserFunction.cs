@@ -1,4 +1,5 @@
 using Manero_UserProvider.Models;
+using Manero_UserProvider.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -12,42 +13,30 @@ namespace Manero_UserProvider.Functions
     public class GetUserFunction
     {
         private readonly ILogger<GetUserFunction> _logger;
-        private readonly DataContext _context;
+        private readonly GetOneService _service;
 
-        public GetUserFunction(ILogger<GetUserFunction> logger, DataContext context)
+        public GetUserFunction(ILogger<GetUserFunction> logger, GetOneService service)
         {
             _logger = logger;
-            _context = context;
+            _service = service;
         }
 
         [Function("GetUserFunction")]
         public async Task<HttpResponseData> Run([HttpTrigger(AuthorizationLevel.Function, "get", Route = "GetUserFunction/{id}")] HttpRequestData req, string id)
         {
             _logger.LogInformation($"Received request for user ID: {id}");
-
             var response = req.CreateResponse();
             try
             {
-                var profile = await _context.AccountUser.FirstOrDefaultAsync(u => u.IdentityUserId == id);
+                var result = await _service.GetUserByIdAsync(id);
 
-                if (profile == null)
+                if (result == null)
                 {
                     _logger.LogWarning($"User with ID {id} not found.");
                     response.StatusCode = System.Net.HttpStatusCode.NotFound;
                     await response.WriteStringAsync($"User with ID {id} not found.");
                     return response;
                 }
-
-                var result = new ProfileModel
-                {
-                    FirstName = profile.FirstName,
-                    LastName = profile.LastName,
-                    ImageUrl = profile.ImageUrl,
-                    Location = profile.Location,
-                    IdentityUserId = profile.IdentityUserId,
-                    PhoneNumber = profile.PhoneNumber,
-                    AccountId = profile.AccountId,
-                };
 
                 _logger.LogInformation($"Returning profile for user ID: {id}");
                 response.StatusCode = System.Net.HttpStatusCode.OK;

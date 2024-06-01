@@ -1,4 +1,5 @@
 using Manero_UserProvider.Handler;
+using Manero_UserProvider.Services;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,11 @@ var host = new HostBuilder()
         services.AddDbContext<DataContext>(x => x.UseSqlServer(Environment.GetEnvironmentVariable("SqlServer")));
         services.AddSingleton<ServiceBusHandler>();
         services.AddScoped<ServiceBusHandler>();
+        services.AddScoped<CreateService>();
+        services.AddScoped<GetAllService>();
+        services.AddScoped<UpdateService>();
+        services.AddScoped<GetOneService>();
+        services.AddScoped<SaveImageService>();
     })
     .Build();
 

@@ -1,4 +1,5 @@
 using Manero_UserProvider.Models;
+using Manero_UserProvider.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
@@ -12,14 +13,13 @@ namespace Manero_UserProvider.Functions
     public class CreateUserFunction
     {
         private readonly ILogger<CreateUserFunction> _logger;
-        private readonly DataContext _context;
+        private readonly CreateService _service;
 
-        public CreateUserFunction(ILogger<CreateUserFunction> logger, DataContext context)
+        public CreateUserFunction(ILogger<CreateUserFunction> logger, CreateService service)
         {
             _logger = logger;
-            _context = context;
+            _service = service;
         }
-
 
         [Function("CreateUserFunction")]
         public async Task <IActionResult> Run([HttpTrigger(AuthorizationLevel.Function, "post")] HttpRequest req)
@@ -34,19 +34,14 @@ namespace Manero_UserProvider.Functions
                     return new BadRequestObjectResult("Invalid user data");
                 }
 
-                var accountUser = new AccountUserEntity
+                var result = await _service.CreateUserAsync(data);
+
+                if (result == null)
                 {
-                    IdentityUserId = data.IdentityUserId,
-                    FirstName = data.FirstName,
-                    LastName = data.LastName,
-                };
+                    return new BadRequestObjectResult("Invalid user data");
+                }
 
-                _context.AccountUser.Add(accountUser);
-                await _context.SaveChangesAsync();
-
-                return new OkObjectResult(data);
-
-
+                return new OkObjectResult(result);
             }
             catch (Exception ex)
             {
